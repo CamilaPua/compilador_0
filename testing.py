@@ -8,6 +8,9 @@ p = 3 ::
     variable = (5 + c) * 4 + (30-p) ::
 write(variable) ::
 capture(a) ::
+if (a == c) then
+blablabalba
+endif ::
 '''
 
 

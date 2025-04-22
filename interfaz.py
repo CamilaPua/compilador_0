@@ -136,7 +136,7 @@ def compilar():
         # Limpiar la línea de posibles espacios en blanco
         line = line.strip()
         if inside_if:
-            if line == "endif":
+            if line.replace(" ", "") == "endif::":
                 # Al encontrar 'endif', terminamos el bloque if
                 if_block.append(line)
                 processed_code.append(" ".join(if_block))
@@ -152,12 +152,10 @@ def compilar():
         else:
             # Línea normal, agregarla sin cambios
             processed_code.append(line)
-    
     # Unir las líneas procesadas de nuevo
     final_code = '\n'.join(processed_code)
-    
     print(final_code)
-
+    
     try:
         # Forzamos un error para comprobar
         # raise Exception("Error de prueba")
