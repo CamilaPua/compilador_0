@@ -23,7 +23,9 @@ def p_statement(p):
 def p_assignment(p):
     "assignment : ID ASSIGN expression"
     if p[3] is None:
-        print(f"Error: Asignación incompleta para '{p[1]}'")
+        error_message = f"Error: Asignación incompleta para '{p[1]}'"
+        print(error_message)
+        salidas.append(error_message)
         p[0] = None
     else:
         variables[p[1]] = p[3]
@@ -36,7 +38,9 @@ def p_expression_var(p):
     try:
         p[0] = variables[p[1]]
     except KeyError:
-        print(f"Error: Variable '{p[1]}' not defined.")
+        error_message = f"Error: Variable '{p[1]}' not defined."
+        print(error_message)
+        salidas.append(error_message)
         p[0] = 0  # Default value
 
 
@@ -85,7 +89,10 @@ def p_factor_id(p):
     try:
         p[0] = variables[p[1]]
     except KeyError:
-        print(f"Error: Variable '{p[1]}' not defined.")
+        error_message = f"Error: Variable '{p[1]}' not defined."
+        print(error_message)
+        salidas.append(error_message)
+        
         p[0] = 0
 
 def p_write(p):
@@ -188,9 +195,13 @@ def p_error(p):
     global errorFound
     errorFound = True
     if p:
-        print(f"Syntax error at '{p.value}'. Line: {p.lineno}")
+        error_message = f"Syntax error at '{p.value}'. Line: {p.lineno}"
+        print(error_message)
+        salidas.append(error_message)
     else:
-        print("Syntax error at end of input")
+        error_message = "Syntax error at end of input"
+        print(error_message)
+        salidas.append(error_message)
 
 
 

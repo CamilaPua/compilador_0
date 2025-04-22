@@ -154,7 +154,6 @@ def compilar():
             processed_code.append(line)
     # Unir las líneas procesadas de nuevo
     final_code = '\n'.join(processed_code)
-    print(final_code)
     
     try:
         # Forzamos un error para comprobar
