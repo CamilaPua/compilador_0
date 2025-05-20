@@ -22,9 +22,12 @@ def p_statement_list(p):
     """statement_list : statement
                       | statement statement_list"""
     if len(p) == 2:
-        p[0] = p[1]
+        p[0] = ('statement_list', [p[1]])
     else:
-        p[0] = ('statement_list', [p[1], p[2]])
+        if isinstance(p[2], tuple) and p[2][0] == 'statement_list':
+            p[0] = ('statement_list', [p[1]] + p[2][1])
+        else:
+            p[0] = ('statement_list', [p[1], p[2]])
 
 
 def p_statement(p):
@@ -32,8 +35,9 @@ def p_statement(p):
                  | write DPOINTS
                  | capture DPOINTS
                  | expression DPOINTS
+                 | boolean_expr DPOINTS
                  | if_statement
-                 | boolean_expr DPOINTS"""
+                 | while_statement"""
     p[0] = p[1]
 
 
@@ -53,10 +57,14 @@ def p_capture(p):
     p[0] = ('CAPTURE', p[3])
 
 
+def p_while_statement(p):
+    """while_statement : WHILE '(' condition ')' DO statement_list ENDWHILE"""
+    p[0] = ('WHILE', p[3], p[6])
+
+
 def p_if_statement(p):
     "if_statement : IF '(' condition ')' THEN statement_list opt_else ENDIF"
-
-    p[0] = ('IF', p[3], p[6], p[7], p[8])
+    p[0] = ('IF', p[3], p[6], p[7])
 
 
 def p_opt_else(p):
@@ -128,7 +136,7 @@ def p_assignment(p):
 def p_expression_var(p):
     "expression : ID"
     try:
-        p[0] = variables[p[1]]
+        p[0] = ('GETVAR', p[1])
     except KeyError:
         error_message = f"Error: Variable '{p[1]}' not defined."
         print(error_message)
@@ -171,7 +179,7 @@ def p_factor_expr(p):
 def p_factor_id(p):
     "factor : ID"
     try:
-        p[0] = variables[p[1]]
+        p[0] = ('GETVAR', p[1])
     except KeyError:
         error_message = f"Error: Variable '{p[1]}' not defined."
         print(error_message)
@@ -245,6 +253,9 @@ def run(p):
             variables[p[1]] = run(p[2])
             return variables[p[1]]
 
+        if p[0] == 'GETVAR':
+            return variables[p[1]]
+
 
         if p[0] == 'WRITE':
             string1 = str(run(p[1]))
@@ -267,6 +278,11 @@ def run(p):
                 return run(p[2])
             elif p[3]:
                 return run(p[3])
+
+        if p[0] == 'WHILE':
+            while run(p[1]):
+                run(p[2])
+            return
 
         if p[0] == 'statement_list':
             for i in p[1]:

@@ -14,6 +14,8 @@ reserved = {
     'else' : 'ELSE',
     'endif' : 'ENDIF',
     'while' : 'WHILE',
+    'endwhile' : 'ENDWHILE',
+    'do' : 'DO',
 
     # others
     'write' : 'WRITE',
