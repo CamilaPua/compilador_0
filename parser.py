@@ -15,19 +15,24 @@ precedence = (
 
 def p_program(p):
     'program : statement_list'
+    run(p[1])
 
 def p_statement_list(p):
     """statement_list : statement
-                      | statement_list statement"""
+                      | statement statement_list"""
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = ('statement_list', [ p[1], p[2] ])
 
 def p_statement(p):
     """statement : assignment DPOINTS
                  | write DPOINTS
                  | capture DPOINTS
                  | expression DPOINTS
-                 | if_statement DPOINTS
+                 | if_statement
                  | boolean_expr DPOINTS"""
-    run(p[1])
+    p[0] = p[1]
 
 
 def p_assignment(p):
@@ -84,7 +89,6 @@ def p_factor_expr(p):
     "factor : '(' expression ')'"
     p[0] = p[2]
 
-#---------FUNCION WRITE---------
 def p_factor_id(p):
     "factor : ID"
     try:
@@ -96,6 +100,7 @@ def p_factor_id(p):
         
         p[0] = 0
 
+#---------FUNCION WRITE---------
 def p_write(p):
     """write : WRITE '(' STRING ')'
              | WRITE '(' expression ')'
@@ -106,14 +111,7 @@ def p_write(p):
     elif len(p) == 7:  # write("mensaje", expresion)
         p[0] = ('WRITE', p[3], p[5])
 #--------------------------
-def p_statement_list(p):
-    """statement_list : statement
-                      | statement_list DPOINTS statement"""
-    if len(p) == 2:
-        p[0] = [p[1]]
-    else:
-        p[1].append(p[3])
-        p[0] = p[1]
+
 
 def p_capture(p):
     "capture : CAPTURE '(' ID ')'"
@@ -127,7 +125,10 @@ def p_if_statement(p):
     "if_statement : IF '(' condition ')' THEN statement_list opt_else ENDIF"
     # p[3] : condición, p[6] : sentencias para el caso verdadero,
     # p[7] : opcionalmente la parte ELSE (None si no se incluye).
-    p[0] = ('if', p[3], p[6], p[7])
+    # if len(p) == 8:
+    p[0] = ('IF', p[3], p[6], p[7], p[8])
+    # else:
+    #     p[0] = ('IF', p[3], p[6], p[7])
 
 def p_opt_else(p):
     """opt_else : ELSE statement_list
@@ -192,7 +193,7 @@ def p_error(p):
     global errorFound
     errorFound = True
     if p:
-        error_message = f"Syntax error at '{p.value}'. Line: {p.lineno}"
+        error_message = f"Syntax error at '{p.value}'"
         print(error_message)
         salidas.append(error_message)
     else:
@@ -241,18 +242,38 @@ def run(p):
             return run(p[1]) and run(p[2])
         if p[0] == 'not':
             return not run(p[1])
+
+
         if p[0] == 'ASSIGN':
             variables[p[1]] = run(p[2])
             return variables[p[1]]
+
+
         if p[0] == 'WRITE':
+            string1 = str(run(p[1]))
             if len(p) == 2:
-                salidas.append(str(p[1]))
-                print(str(p[1]))
+                string = string1
             else:
-                salidas.append(str(p[1]) + str(p[2]))
-                print(str(p[1]) + str(p[2]))
+                string2 = str(run(p[2]))
+                string = string1 + string2
+            salidas.append(string)
+            print(string)
+
         if p[0] == 'CAPTURE':
             var_value = input()
             variables[p[1]] = var_value
+
+
+        if p[0] == 'IF':
+            do_statement = run(p[1])
+            if do_statement:
+                return run(p[2])
+            elif p[3]:
+                return run(p[3])
+
+
+        if p[0] == 'statement_list':
+            for i in p[1]:
+                run(i)
     else:
         return p
