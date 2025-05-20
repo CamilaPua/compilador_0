@@ -3,9 +3,10 @@ from parser import parser, variables
 
 
 code = '''
-a = 5<>3 ::
-not a ::
-1+3 ::
+write("HOLA") ::
+write("HOLA",5) ::
+capture(a) ::
+a ::
 '''
 # c = 4 ::
 # p = 3 ::

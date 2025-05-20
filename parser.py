@@ -1,5 +1,5 @@
 import ply.yacc as yacc
-from lexer import tokens  # Asume que tu código anterior está en lexer.py
+from lexer import tokens
 
 variables = {}
 salidas = []
@@ -27,7 +27,7 @@ def p_statement(p):
                  | expression DPOINTS
                  | if_statement DPOINTS
                  | boolean_expr DPOINTS"""
-    print(run(p[1]))
+    run(p[1])
 
 
 def p_assignment(p):
@@ -102,11 +102,9 @@ def p_write(p):
              | WRITE '(' STRING ',' expression ')' """
     
     if len(p) == 5:  # write("mensaje")
-        salidas.append(str(p[3]))
-    elif len(p) == 6:  # write(expresion)
-        salidas.append(str(p[3]))
+        p[0] = ('WRITE', p[3])
     elif len(p) == 7:  # write("mensaje", expresion)
-        salidas.append(str(p[3]) + str(p[5]))
+        p[0] = ('WRITE', p[3], p[5])
 #--------------------------
 def p_statement_list(p):
     """statement_list : statement
@@ -119,9 +117,7 @@ def p_statement_list(p):
 
 def p_capture(p):
     "capture : CAPTURE '(' ID ')'"
-    var = p[3]
-    salidas.append(f"Ingreso solicitado para variable '{p[3]}'")
-    variables[var] = "valor_simulado"  # Puedes poner aquí un valor fijo
+    p[0] = ('CAPTURE', p[3])
 
 
 # //////////////////////////////////
@@ -248,5 +244,15 @@ def run(p):
         if p[0] == 'ASSIGN':
             variables[p[1]] = run(p[2])
             return variables[p[1]]
+        if p[0] == 'WRITE':
+            if len(p) == 2:
+                salidas.append(str(p[1]))
+                print(str(p[1]))
+            else:
+                salidas.append(str(p[1]) + str(p[2]))
+                print(str(p[1]) + str(p[2]))
+        if p[0] == 'CAPTURE':
+            var_value = input()
+            variables[p[1]] = var_value
     else:
         return p

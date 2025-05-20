@@ -35,7 +35,7 @@ tokens = (
     'NOTEQ',    # <>
 ) + tuple(reserved.values())
 
-literals = ('+', '-', '*', '/', '(', ')', '<', '>')
+literals = ('+', '-', '*', '/', '(', ')', '<', '>', ',')
 
 t_LESSEQ = r'<='
 t_GREATEREQ = r'>='
