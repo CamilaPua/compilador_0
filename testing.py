@@ -3,15 +3,18 @@ from parser import parser, variables
 
 
 code = '''
-c = 4 ::
-p = 3 ::
-    variable = (5 + c) * 4 + (30-p) ::
-write(variable) ::
-capture(a) ::
-if (a == c) then
-blablabalba
-endif ::
+1+2* 3 /2 ::
 '''
+# c = 4 ::
+# p = 3 ::
+# variable = (5 + c) * 4 + (30-p) ::
+# variable ::
+# b=1+variable ::
+# write(variable) ::
+# capture(a) ::
+# if (a == c) then
+# blablabalba
+# endif ::
 
 
 for line in code.split('\n'):
