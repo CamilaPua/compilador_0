@@ -3,7 +3,9 @@ from parser import parser, variables
 
 
 code = '''
-1+2* 3 /2 ::
+a = 5<>3 ::
+not a ::
+1+3 ::
 '''
 # c = 4 ::
 # p = 3 ::

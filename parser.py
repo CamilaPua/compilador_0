@@ -6,8 +6,10 @@ salidas = []
 
 
 precedence = (
+
     ('left', '+', '-'),
     ('left', '*', '/'),
+
 )
 
 
@@ -23,19 +25,20 @@ def p_statement(p):
                  | write DPOINTS
                  | capture DPOINTS
                  | expression DPOINTS
-                 | if_statement DPOINTS"""
+                 | if_statement DPOINTS
+                 | boolean_expr DPOINTS"""
     print(run(p[1]))
 
 
 def p_assignment(p):
-    "assignment : ID ASSIGN expression"
+    """assignment : ID ASSIGN expression
+                  | ID ASSIGN boolean_expr"""
     if p[3] is None:
         error_message = f"Error: Asignación incompleta para '{p[1]}'"
         print(error_message)
         salidas.append(error_message)
         p[0] = None
     else:
-        variables[p[1]] = p[3]
         p[0] = ('ASSIGN', p[1], p[3])
 
 
@@ -165,7 +168,6 @@ def p_boolean_expr_paren(p):
 def p_boolean_expr_rel(p):
     "boolean_expr : expression relational_operator expression"
     p[0] = (p[2], p[1], p[3])
-    print("HOLAAA")
 
 def p_boolean_expr_exp(p):
     "boolean_expr : expression"
@@ -225,5 +227,26 @@ def run(p):
             return run(p[1]) * run(p[2])
         if p[0] == '/':
             return run(p[1]) / run(p[2])
+        if p[0] == '<':
+            return run(p[1]) < run(p[2])
+        if p[0] == '>':
+            return run(p[1]) > run(p[2])
+        if p[0] == '<=':
+            return run(p[1]) <= run(p[2])
+        if p[0] == '>=':
+            return run(p[1]) >= run(p[2])
+        if p[0] == '==':
+            return run(p[1]) == run(p[2])
+        if p[0] == '<>':
+            return run(p[1]) != run(p[2])
+        if p[0] == 'or':
+            return run(p[1]) or run(p[2])
+        if p[0] == 'and':
+            return run(p[1]) and run(p[2])
+        if p[0] == 'not':
+            return not run(p[1])
+        if p[0] == 'ASSIGN':
+            variables[p[1]] = run(p[2])
+            return variables[p[1]]
     else:
         return p
